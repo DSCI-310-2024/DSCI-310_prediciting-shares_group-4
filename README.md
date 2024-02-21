@@ -1,1 +1,1 @@
-# DSCI-310_prediciting-shares_group-4
+# DSCI-310_predicting-shares_group-4
