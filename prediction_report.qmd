@@ -1,0 +1,225 @@
+---
+title: Exploratory Data Analysis
+jupyter: ir
+---
+
+```{r}
+#| vscode: {languageId: r}
+# Assuming your kernel autoinstalled renv, uncomment the following code
+# to install the rest of the packages
+# renv::restore()
+```
+
+```{r}
+#| vscode: {languageId: r}
+library(renv)
+library(GGally)
+library(tidymodels)
+library(tidyverse)
+library(leaps)
+library(caret)
+library(boot)
+library(pROC)
+library(repr)
+library(glmnet)
+```
+
+```{r}
+#| vscode: {languageId: r}
+articles <- read_csv('data/OnlineNewsPopularity.csv')
+```
+
+
+
+```{r}
+#| vscode: {languageId: r}
+ggplot(data = articles) +
+    geom_boxplot(aes(y = shares)) +
+    labs(title = "Boxplot of Shares") +
+    ylab(label = 'Shares') +
+    theme(axis.title = element_text(size = 20), axis.text = element_text(size = 15), title = element_text(size = 25))
+```
+
+```{r}
+#| vscode: {languageId: r}
+summary(articles$shares)
+sd(articles$shares)
+```
+
+The target variable is centered at 1400, while the spread is quite large, with a standard deviation of 11627. Therefore, we will adjust our work from regression to classification to determine whether an article will be popular. Our definition of an article being popular would to be above average, so an article will be classified as popular if its above 1400 shares, and will not be popular if below 1400.
+
+```{r}
+#| vscode: {languageId: r}
+articles_temp <- articles
+
+drop_columns <- c('url')
+
+articles_temp <- articles_temp[, !(names(articles_temp) %in% c(drop_columns))]#, one_hot_columns))]
+
+articles_temp <- articles_temp |> mutate('shares' = ifelse(shares >= 1400, 1 , 0))
+
+articles_clean <- articles_temp
+```
+
+```{r}
+#| vscode: {languageId: r}
+write.csv(articles_clean, 'data/clean_Articles.csv')
+```
+
+
+```{r}
+#| vscode: {languageId: r}
+set.seed(2024)
+
+articles_clean$ID <- 1:nrow(articles_clean)
+
+training_articles <- articles_clean |> slice_sample(prop = 0.7)
+
+testing_articles <- anti_join(articles_clean, training_articles, by = "ID")
+
+
+training_articles <- training_articles[, !(names(training_articles) %in% c('ID'))]
+testing_articles <- testing_articles[, !(names(testing_articles) %in% c('ID'))]
+
+head(training_articles, 3)
+nrow(training_articles)
+
+head(testing_articles, 3)
+nrow(testing_articles)
+```
+
+```{r}
+#| vscode: {languageId: r}
+write.csv(training_articles, 'data/training_data.csv')
+write.csv(testing_articles, 'data/testing_data.csv')
+```
+
+Going to fit an initial linear model using all attributes to receive a baseline ordinary model for logistic regression. Using logistic regression since our target variable is a classification problem, and not a regression problem.
+
+```{r}
+#| vscode: {languageId: r}
+article_logistic_regression <- glm(shares ~ ., data = training_articles, family = binomial)
+
+summary(article_logistic_regression)
+```
+
+```{r}
+#| vscode: {languageId: r}
+# Code adapted from UBC STAT 301 Lectures 12/13, Gabriela V. Cohen Freue 2022
+
+misclassification_rate <- function(y, p.hat){
+ y_hat <- round(p.hat, 0)
+ error_rate <- sum(abs(y - y_hat) == 1) / length(y_hat)
+ return(error_rate)
+}
+
+cv_logistic <-
+ cv.glm(
+ glmfit = article_logistic_regression,
+ data = training_articles,
+ K = 10,
+ cost = misclassification_rate)
+
+cv_logistic$delta[1]
+```
+
+Our training error is 0.346, which is large. The large training error could be due to multiple factors, such as the underlying distribution. Due to the amount of parameters, each case is likely to have an unique set of attribute values so it becomes more difficult for the model
+
+```{r}
+#| vscode: {languageId: r}
+articles_pred_class <- 
+    round(predict(article_logistic_regression, newdata = training_articles, type = 'response'), 0)
+
+head(articles_pred_class)
+```
+
+```{r}
+#| vscode: {languageId: r}
+articles_conf_mat <- 
+        confusionMatrix(
+            data = as.factor(articles_pred_class),
+            reference = as.factor(training_articles$shares)
+        )
+
+articles_conf_mat
+```
+
+### TODO
+Using our ordinary model as well as the training data, we predict whether an article is popular or not. Then we use that along with the true values for the confusion matrix, which shows ...
+
+```{r}
+#| vscode: {languageId: r}
+options(repr.plot.width = 8, repr.plot.height = 8)
+
+ROC_full_log <- roc(
+    response = training_articles$shares,
+    predictor = predict(article_logistic_regression, type = 'response')
+)
+
+plot(ROC_full_log,
+        print.auc = TRUE, col = 'blue', lwd = 3, lty = 2,
+        main = 'ROC Curves for Article Dataset'
+    )
+```
+
+```{r}
+#| vscode: {languageId: r}
+auc_tibble <- tibble(Model = 'Full Model', AUC = as.double(ROC_full_log$auc))
+auc_tibble
+```
+
+The AUC for the model is 0.709, meaning that there is 70.9% chance that our model will be able to identify between a popular and unpopular article.
+
+Since we have multiple attributes, we wish to find the most significant attributes that contribute the most to the amount of shares an article receives. We will do so using forward selection by way of the `tidymodels` package.
+
+```{r}
+#| vscode: {languageId: r}
+model_mat_X_train <-
+    model.matrix(object = article_logistic_regression, data = training_articles)[, -1]
+
+model_mat_Y_train <-
+    as.matrix(training_articles$shares, ncol = 1)
+```
+
+```{r}
+#| vscode: {languageId: r}
+articles_cv_lambda_lasso <- 
+    cv.glmnet(
+        x = model_mat_X_train, y = model_mat_Y_train,
+        alpha = 1,
+        family = 'binomial',
+        type.measure = 'auc',
+        nfolds = 5
+    )
+articles_cv_lambda_lasso
+```
+
+```{r}
+#| vscode: {languageId: r}
+articles_lambda_1se_AUC_LASSO <- round(articles_cv_lambda_lasso$lambda.1se, 4)
+```
+
+```{r}
+#| vscode: {languageId: r}
+articles_LASSO_1se_AUC <- glmnet(
+ x = model_mat_X_train, y = model_mat_Y_train,
+ alpha = 1,
+ family = "binomial",
+ lambda = articles_lambda_1se_AUC_LASSO
+)
+
+sum((coef(articles_LASSO_1se_AUC)[, 1] != 0) == TRUE)
+```
+
+```{r}
+#| vscode: {languageId: r}
+auc_tibble <- auc_tibble |> add_row(Model = 'lasso', AUC = articles_cv_lambda_lasso$cvm[articles_cv_lambda_lasso$index["1se",]])
+```
+
+```{r}
+#| vscode: {languageId: r}
+auc_tibble
+```
+
+The lasso model has slightly less area under the curve, however it uses 36 input variables instead of the 60 the full model uses, which is more efficient to compute.
+
