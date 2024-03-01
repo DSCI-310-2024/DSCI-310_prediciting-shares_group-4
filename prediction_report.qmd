@@ -284,4 +284,3 @@ This analysis might lead to several Future questions. Firstly, whether there are
 Dataset Source: 
 Online news popularity. UCI Machine Learning Repository. (2015, January). https://archive.ics.uci.edu/dataset/332/online+news+popularity 
 
-Boumans, J., Trilling, D., Vliegenthart, R., & Boomgaarden, H. (2018). The Agency Makes the (Online) News World Go Round: The Impact of News Agency Content on Print and Online News. International Journal of Communication, 12, 1768-1789. https://ijoc.org/index.php/ijoc/article/view/7109
