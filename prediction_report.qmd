@@ -10,9 +10,15 @@ jupyter: ir
 # renv::restore()
 ```
 
-Title: Predicting number of shares an article will get based on the number of links, images and videos in the article.
-Summary: Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. Our finisdings suggest that ...
+## Title
+Predicting number of shares an article will get based on the number of links, images and videos in the article.
+## Summary
+ Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. 
+## Introduction
+An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. The model aims to predict whether an article will be popular based on the number of links, images, and videos in it. 
+The dataset is publicly available and has 61 attributes out of which we chose 4 including the three predictors and the variable of interest, shares, which refers to the number of shares of the article in social networks.
 
+## Methods and Results
 Loading relevant packages.
 ```{r}
 #| vscode: {languageId: r}
@@ -167,3 +173,63 @@ best_k_plot <- accuracies |>
     ggtitle("Accuracy Estimates vs. Number of Neighbors")
 best_k_plot
 ```
+
+The value of K that generates the highest accuracy is about 50, therefore we choose K = 50 and use that to build the model.
+
+```{r}
+knn_spec <- nearest_neighbor(weight_func = "rectangular", neighbors = 50) |>
+    set_engine("kknn") |>
+    set_mode("classification")
+knn_spec
+```
+
+Next, we use a workflow to fit our model using our training set, predict the labels in our testing set, and incorporate the predictions as the new column .pred_class into the testing set.
+
+```{r}
+knn_fit <- workflow() |>
+    add_recipe(articles_recipe) |>
+    add_model(knn_spec) |>
+    fit(data = articles_training)
+
+articles_predict <- predict(knn_fit, articles_testing) |>
+    bind_cols(articles_testing)
+```
+
+We now look at the accuracy of the classifier using the testing set with the metrics function.
+
+```{r}
+
+articles_accuracy <- articles_predict |>
+    metrics(truth = is_popular, estimate = .pred_class) |>
+    filter(.metric == "accuracy")
+
+articles_accuracy
+```
+
+As can be seen, the accuracy of the classifier isn't very high at 54.6%. Below is the confusion matrix of the classifier model.
+
+```{r}
+confusion_matrix <- articles_predict |>
+    conf_mat(truth = is_popular, estimate = .pred_class)
+confusion_matrix
+```
+
+Given that we care more about popular articles with higher shares, we take popular articles as the "positive" observations. The precision is therefore 0.6211 which is slightly higher than the accuracy of 0.546. The recall is 0.3844 which is significantly lower than the accuracy. This suggests that the model is somewhat precise in predicting popular articles but is cautious and misses some actual instances of popular articles in doing so.
+
+## Discussion:
+Summary: Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. Our findings suggest that the model is only somwhat reliable with an accuracy of 0.546 with precision higher than accuracy but recall lower than accuracy.
+
+Are the findings as expected:
+TODO
+
+Impact of Findings:
+TODO
+
+Future Questions from Analysis:
+TODO
+
+## References
+Dataset Source: 
+Online news popularity. UCI Machine Learning Repository. (2015, January). https://archive.ics.uci.edu/dataset/332/online+news+popularity 
+
+TODO (at least 3 more references needed)
