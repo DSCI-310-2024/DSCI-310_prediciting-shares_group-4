@@ -18,14 +18,6 @@ To finish up this project you will need to install:
 -   R packages:
     -   `renv`
     -   `GGally`
-    -   `tidymodels`
-    -   `tidyverse`
-    -   `leaps`
-    -   `caret`
-    -   `boot`
-    -   `pROC`
-    -   `repr`
-    -   `glmnet`
 -   Quarto
 
 ### Licenses
