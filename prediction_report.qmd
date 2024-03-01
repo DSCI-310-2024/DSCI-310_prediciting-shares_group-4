@@ -3,6 +3,15 @@ title: Exploratory Data Analysis
 jupyter: ir
 ---
 
+### Introduction:
+
+Social media platforms, such as Twitter, have transformed the way in which information is disseminated and consumed on a global scale. These digital arenas enable a vast online community to quickly share and consume personal thoughts and professional insights, threaded through a variety of media forms. With over 500 million active users, Twitter has become particularly noteworthy for pinpointing the workings of information exchange and the features of content that make it most popular (López-Goñi & Sánchez-Angulo, 2018).
+
+In their research on user activity in Twitter, Oh and Syn (2015) posit that human behavior in everyday life is driven by many factors, and is thus complex and multi-faceted. They uncover a useful lens for examining user activity in casual online environments, while Luo et al.(2020) report that mobile technology which will exceed 12.3 billion devices by 2022, over 90% of which will be smartphones is increasingly prevalent. This underscores the increasing relevance of social media platforms in the everyday sharing and transmission of information.
+
+This research is fundamentally concerned with discerning the determinants of article popularity, as captured by the number of times each article was shared, to bring to light the many factors that drive user engagement and content diffusion. Using a massive dataset of articles and associated measures over a period of two years from Mashable to build models that could more accurately identify the traits that result in the visibility and engagement of content published to social media. By exploring the relationship between shared articles' characteristics and how popular they become, the hope is that this work may yield findings that offer guidance to both enterprise and solo publishers seeking to make their work more prevalent and persuasive in the digital enclave.
+
+
 ```{r}
 #| vscode: {languageId: r}
 # Assuming your kernel autoinstalled renv, uncomment the following code
@@ -230,6 +239,7 @@ TODO
 
 ## References
 Dataset Source: 
-Online news popularity. UCI Machine Learning Repository. (2015, January). https://archive.ics.uci.edu/dataset/332/online+news+popularity 
-
-TODO (at least 3 more references needed)
+- Online news popularity. UCI Machine Learning Repository. (2015, January). https://archive.ics.uci.edu/dataset/332/online+news+popularity 
+- López-Goñi, I., & Sánchez-Angulo, M. (2018). Social networks as a tool for science communication and public engagement: Focus on twitter. FEMS Microbiology Letters, 365(2), 1. https://doi.org/10.1093/femsle/fnx246
+- Luo, T., Freeman, C., & Stefaniak, J. (2020). “Like, comment, and share”—professional development through social media in higher education: A systematic review. Educational Technology Research and Development, 68(4), 1659-1683. https://doi.org/10.1007/s11423-020-09790-5
+- Oh, S., & Syn, S. Y. (2015). Motivations for sharing information and social support in social media: A comparative analysis of facebook, twitter, delicious, YouTube, and flickr. Journal of the Association for Information Science and Technology, 66(10), 2045-2060. https://doi.org/10.1002/asi.23320
