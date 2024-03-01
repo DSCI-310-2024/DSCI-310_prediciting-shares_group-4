@@ -12,8 +12,10 @@ jupyter: ir
 
 ## Title
 Predicting number of shares an article will get based on the number of links, images and videos in the article.
+
 ## Summary
  Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. 
+
 ## Introduction
 An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. The model aims to predict whether an article will be popular based on the number of links, images, and videos in it. 
 The dataset is publicly available and has 61 attributes out of which we chose 4 including the three predictors and the variable of interest, shares, which refers to the number of shares of the article in social networks.
@@ -27,12 +29,27 @@ library(renv)
 library(tidymodels)
 library(tidyverse)
 library(repr)
+
 ```
 
 Reading data from dataset.
 ```{r}
 #| vscode: {languageId: r}
-articles <- read_csv('data/OnlineNewsPopularity.csv')
+url <- "https://archive.ics.uci.edu/static/public/332/online+news+popularity.zip"
+download.file(url,"articles.zip")
+temp_zip <- tempfile()
+download.file(url, temp_zip)
+# Unzip the file in the data directory
+unzip(temp_zip, exdir = "data/")
+# Cleanup: Remove the temporary zip file
+unlink(temp_zip)
+directories <- list.dirs("data/", recursive = FALSE)
+
+# List the files within the first directory, filtering for CSV files
+csv_files <- list.files(directories[1], pattern = "\\.csv$", full.names = TRUE)
+
+articles <- read.csv(csv_files, header = TRUE)
+
 ```
 
 Creating a boxplot of the variable of interest
@@ -44,6 +61,8 @@ ggplot(data = articles) +
     ylab(label = 'Shares') +
     theme(axis.title = element_text(size = 20), axis.text = element_text(size = 15), title = element_text(size = 25))
 ```
+Figure 1. Boxplot of the variable of interest, shares
+
 
 Obtaining summary statistics about the variable of interest.
 ```{r}
@@ -89,6 +108,8 @@ num_obs_training <- articles_training |>
 
 num_obs_training
 ```
+Table 1. Class distribution of article popularity in training set
+
 
 We can see that our data is balanced and since we have close percentages of data in both popular and unpopular classes, with popular holding the majority at 53.4%.
 
@@ -100,25 +121,49 @@ mean_hrefs_plot <- ggplot(articles_training, aes(x = num_hrefs, fill = is_popula
   geom_histogram(color = "black") +
   labs(title = "Distribution of number of links", 
        x = "Number of links", 
-       fill = "Popular")     
-mean_hrefs_plot
+       fill = "Popular")+
+       scale_fill_manual(labels = c("Unpopular", "Popular"))   
+
 
 # Histogram 1: Distribution of the number of images in article
 mean_imgs_plot <- ggplot(articles_training, aes(x = num_imgs, fill = is_popular)) +
   geom_histogram(color = "black") +
   labs(title = "Distribution of number of images", 
        x = "Number of images", 
-       fill = "Popular")     
-mean_imgs_plot
+       fill = "Popular")+
+       scale_fill_manual(labels = c("Unpopular", "Popular"))       
+
 
 # Histogram 1: Distribution of the number of videos in article
 mean_videos_plot <- ggplot(articles_training, aes(x = num_videos, fill = is_popular)) +
   geom_histogram(color = "black") +
   labs(title = "Distribution of number of videos", 
        x = "Number of videos", 
-       fill = "Popular")     
+       fill = "Popular")  +
+       scale_fill_manual(labels = c("Unpopular", "Popular"))   
+```
+
+
+```{r}
+mean_hrefs_plot
+```
+Figure 2. Histogram of number of links in popular and non-Popular articles
+
+
+
+```{r}
+mean_imgs_plot
+```
+Figure 3. Histogram of number of images in popular and non-Popular articles
+
+
+
+
+```{r}
 mean_videos_plot
 ```
+Figure 4. Histogram of number of videos in popular and non-Popular articles
+
 
 Next, we start building our knn classification model.
 
@@ -161,6 +206,9 @@ accuracies <- knn_results |>
 
 print(accuracies)
 ```
+Table 2. Summary of KNN model accuracy across different K values with 5-fold cross-validation
+
+
 
 We now work on making an accuracy vs k plot.
 
@@ -173,6 +221,8 @@ best_k_plot <- accuracies |>
     ggtitle("Accuracy Estimates vs. Number of Neighbors")
 best_k_plot
 ```
+Figure 4.  Results from 5-fold cross validation to choose K. (Accuracy was used as the classification metric as K was varied.)
+
 
 The value of K that generates the highest accuracy is about 50, therefore we choose K = 50 and use that to build the model.
 
@@ -205,6 +255,7 @@ articles_accuracy <- articles_predict |>
 
 articles_accuracy
 ```
+Table 3. Classifier testing set accuracy
 
 As can be seen, the accuracy of the classifier isn't very high at 54.6%. Below is the confusion matrix of the classifier model.
 
@@ -213,6 +264,7 @@ confusion_matrix <- articles_predict |>
     conf_mat(truth = is_popular, estimate = .pred_class)
 confusion_matrix
 ```
+Table 4. Confusion matrix of Aarticle popularity predictions on test data
 
 Given that we care more about popular articles with higher shares, we take popular articles as the "positive" observations. The precision is therefore 0.6211 which is slightly higher than the accuracy of 0.546. The recall is 0.3844 which is significantly lower than the accuracy. This suggests that the model is somewhat precise in predicting popular articles but is cautious and misses some actual instances of popular articles in doing so.
 
@@ -220,16 +272,16 @@ Given that we care more about popular articles with higher shares, we take popul
 Summary: Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. Our findings suggest that the model is only somwhat reliable with an accuracy of 0.546 with precision higher than accuracy but recall lower than accuracy.
 
 Are the findings as expected:
-TODO
+Yes, this is what we expected. Given that a basic KNN  model was used for prediction, it's reasonable to assume that this simple model might be slightly underfitting. Consequently, we anticipate achieving improved outcomes by exploring more complex models.
 
 Impact of Findings:
-TODO
+This insight has the potential to refine content creation strategies by enriching our comprehension of the elements that contribute to content's engagement and popularity, such as identifying the ideal balance of links, images, and videos within an article. Adopting this strategy could significantly boost the future articles' shareability.
 
 Future Questions from Analysis:
-TODO
+This analysis might lead to several Future questions. Firstly, whether there are more model models capable of achieving higher precision and recall. Secondly, the impact of the quality of links, images, and videos within articles on their popularity presents another area for in-depth investigation. 
 
 ## References
 Dataset Source: 
 Online news popularity. UCI Machine Learning Repository. (2015, January). https://archive.ics.uci.edu/dataset/332/online+news+popularity 
 
-TODO (at least 3 more references needed)
+Boumans, J., Trilling, D., Vliegenthart, R., & Boomgaarden, H. (2018). The Agency Makes the (Online) News World Go Round: The Impact of News Agency Content on Print and Online News. International Journal of Communication, 12, 1768-1789. https://ijoc.org/index.php/ijoc/article/view/7109
