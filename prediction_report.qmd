@@ -122,7 +122,7 @@ mean_hrefs_plot <- ggplot(articles_training, aes(x = num_hrefs, fill = is_popula
   labs(title = "Distribution of number of links", 
        x = "Number of links", 
        fill = "Popular")+
-       scale_fill_manual(labels = c("Unpopular", "Popular"))   
+       scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))  
 
 
 # Histogram 1: Distribution of the number of images in article
@@ -131,7 +131,7 @@ mean_imgs_plot <- ggplot(articles_training, aes(x = num_imgs, fill = is_popular)
   labs(title = "Distribution of number of images", 
        x = "Number of images", 
        fill = "Popular")+
-       scale_fill_manual(labels = c("Unpopular", "Popular"))       
+       scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))        
 
 
 # Histogram 1: Distribution of the number of videos in article
@@ -140,9 +140,8 @@ mean_videos_plot <- ggplot(articles_training, aes(x = num_videos, fill = is_popu
   labs(title = "Distribution of number of videos", 
        x = "Number of videos", 
        fill = "Popular")  +
-       scale_fill_manual(labels = c("Unpopular", "Popular"))   
-```
-
+       scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))   
+``````
 
 ```{r}
 mean_hrefs_plot
