@@ -19,27 +19,32 @@ This research is fundamentally concerned with discerning the determinants of art
 # renv::restore()
 ```
 
+## Title
+Predicting number of shares an article will get based on the number of links, images and videos in the article.
+## Summary
+ Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. 
+## Introduction
+An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. The model aims to predict whether an article will be popular based on the number of links, images, and videos in it. 
+The dataset is publicly available and has 61 attributes out of which we chose 4 including the three predictors and the variable of interest, shares, which refers to the number of shares of the article in social networks.
+
+## Methods and Results
+Loading relevant packages.
 ```{r}
 #| vscode: {languageId: r}
+library(kknn)
 library(renv)
-library(GGally)
 library(tidymodels)
 library(tidyverse)
-library(leaps)
-library(caret)
-library(boot)
-library(pROC)
 library(repr)
-library(glmnet)
 ```
 
+Reading data from dataset.
 ```{r}
 #| vscode: {languageId: r}
 articles <- read_csv('data/OnlineNewsPopularity.csv')
 ```
 
-
-
+Creating a boxplot of the variable of interest
 ```{r}
 #| vscode: {languageId: r}
 ggplot(data = articles) +
@@ -49,25 +54,23 @@ ggplot(data = articles) +
     theme(axis.title = element_text(size = 20), axis.text = element_text(size = 15), title = element_text(size = 25))
 ```
 
+Obtaining summary statistics about the variable of interest.
 ```{r}
 #| vscode: {languageId: r}
 summary(articles$shares)
 sd(articles$shares)
 ```
 
-The target variable is centered at 1400, while the spread is quite large, with a standard deviation of 11627. Therefore, we will adjust our work from regression to classification to determine whether an article will be popular. Our definition of an article being popular would to be above average, so an article will be classified as popular if its above 1400 shares, and will not be popular if below 1400.
+The variable of interest, shares, has a median of 1400 and a mean of 3395. The distribution spread is quite large, with a standard deviation of 11627. We will be using knn classification to determine whether an article will be popular. We will create a new variable called is_popular with two values 1 (popular) and 0 (unpopular)". An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares.
 
 ```{r}
 #| vscode: {languageId: r}
-articles_temp <- articles
+articles_clean <- articles |>
+      select(shares, num_hrefs, num_imgs, num_videos) |>
+      mutate(is_popular = ifelse(shares < 1400, 0, 1)) |>
+      mutate(is_popular = as.factor(is_popular))
 
-drop_columns <- c('url')
-
-articles_temp <- articles_temp[, !(names(articles_temp) %in% c(drop_columns))]#, one_hot_columns))]
-
-articles_temp <- articles_temp |> mutate('shares' = ifelse(shares >= 1400, 1 , 0))
-
-articles_clean <- articles_temp
+head(articles_clean)
 ```
 
 ```{r}
@@ -75,165 +78,168 @@ articles_clean <- articles_temp
 write.csv(articles_clean, 'data/clean_Articles.csv')
 ```
 
-
+Since we will be performing classification, we split our data into a training and a testing set with a 60% proportion.
 ```{r}
 #| vscode: {languageId: r}
 set.seed(2024)
 
-articles_clean$ID <- 1:nrow(articles_clean)
-
-training_articles <- articles_clean |> slice_sample(prop = 0.7)
-
-testing_articles <- anti_join(articles_clean, training_articles, by = "ID")
-
-
-training_articles <- training_articles[, !(names(training_articles) %in% c('ID'))]
-testing_articles <- testing_articles[, !(names(testing_articles) %in% c('ID'))]
-
-head(training_articles, 3)
-nrow(training_articles)
-
-head(testing_articles, 3)
-nrow(testing_articles)
+articles_data_split <- initial_split(articles_clean, prop = 0.6, strata = is_popular)
+articles_training <- training(articles_data_split)
+articles_testing <- testing(articles_data_split)
 ```
+
+We start our preliminary data analysis process by examining the number of observations we have in the training set for each class.
 
 ```{r}
-#| vscode: {languageId: r}
-write.csv(training_articles, 'data/training_data.csv')
-write.csv(testing_articles, 'data/testing_data.csv')
+num_obs_training <- articles_training |>
+      group_by(is_popular) |>
+      summarize(n = n()) |>
+      mutate(percentage = 100*n/nrow(articles_training))
+
+num_obs_training
 ```
 
-Going to fit an initial linear model using all attributes to receive a baseline ordinary model for logistic regression. Using logistic regression since our target variable is a classification problem, and not a regression problem.
+We can see that our data is balanced and since we have close percentages of data in both popular and unpopular classes, with popular holding the majority at 53.4%.
+
+Next, we visualize the distributions of our predictor variables: num_hrefs, num_imgs, and num_videos. We use is_popular as the fill argument.
 
 ```{r}
-#| vscode: {languageId: r}
-article_logistic_regression <- glm(shares ~ ., data = training_articles, family = binomial)
+# Histogram 1: Distribution of the number of links in article
+mean_hrefs_plot <- ggplot(articles_training, aes(x = num_hrefs, fill = is_popular)) +
+  geom_histogram(color = "black") +
+  labs(title = "Distribution of number of links", 
+       x = "Number of links", 
+       fill = "Popular")     
+mean_hrefs_plot
 
-summary(article_logistic_regression)
+# Histogram 1: Distribution of the number of images in article
+mean_imgs_plot <- ggplot(articles_training, aes(x = num_imgs, fill = is_popular)) +
+  geom_histogram(color = "black") +
+  labs(title = "Distribution of number of images", 
+       x = "Number of images", 
+       fill = "Popular")     
+mean_imgs_plot
+
+# Histogram 1: Distribution of the number of videos in article
+mean_videos_plot <- ggplot(articles_training, aes(x = num_videos, fill = is_popular)) +
+  geom_histogram(color = "black") +
+  labs(title = "Distribution of number of videos", 
+       x = "Number of videos", 
+       fill = "Popular")     
+mean_videos_plot
 ```
+
+Next, we start building our knn classification model.
+
+We start with making a recipe using the training data.
+```{r}
+articles_recipe <- recipe(is_popular ~ num_hrefs + num_imgs + num_videos, data = articles_training) |>
+    step_scale(all_predictors()) |>
+    step_center(all_predictors())
+articles_recipe
+```
+
+Next, we build a tuning model for picking the best value of k.
 
 ```{r}
-#| vscode: {languageId: r}
-# Code adapted from UBC STAT 301 Lectures 12/13, Gabriela V. Cohen Freue 2022
-
-misclassification_rate <- function(y, p.hat){
- y_hat <- round(p.hat, 0)
- error_rate <- sum(abs(y - y_hat) == 1) / length(y_hat)
- return(error_rate)
-}
-
-cv_logistic <-
- cv.glm(
- glmfit = article_logistic_regression,
- data = training_articles,
- K = 10,
- cost = misclassification_rate)
-
-cv_logistic$delta[1]
+tune_spec <- nearest_neighbor(weight_func = "rectangular", neighbors = tune()) |>
+    set_engine("kknn") |>
+    set_mode("classification")
 ```
 
-Our training error is 0.346, which is large. The large training error could be due to multiple factors, such as the underlying distribution. Due to the amount of parameters, each case is likely to have an unique set of attribute values so it becomes more difficult for the model
+Next, we perform cross-validation and create a workflow that calculate the metrics for each of the K values 1, 6, ..., 46, and then return a data frame that shows the accuracy of each K value.
 
 ```{r}
-#| vscode: {languageId: r}
-articles_pred_class <- 
-    round(predict(article_logistic_regression, newdata = training_articles, type = 'response'), 0)
+set.seed(2023) # set the seed
 
-head(articles_pred_class)
+# cross-validation
+articles_vfold <- vfold_cv(articles_training, v = 5, strata = is_popular)
+
+# create a set of K values
+kvals <- tibble(neighbors = seq(from = 1, to = 100, by = 5))
+
+# data analysis workflow                       
+    knn_results <- workflow() |>
+    add_recipe(articles_recipe) |>
+    add_model(tune_spec) |>
+    tune_grid(resamples = articles_vfold, grid = kvals) |>
+    collect_metrics()
+
+accuracies <- knn_results |>
+    filter(.metric == "accuracy")
+
+print(accuracies)
 ```
+
+We now work on making an accuracy vs k plot.
 
 ```{r}
-#| vscode: {languageId: r}
-articles_conf_mat <- 
-        confusionMatrix(
-            data = as.factor(articles_pred_class),
-            reference = as.factor(training_articles$shares)
-        )
-
-articles_conf_mat
+best_k_plot <- accuracies |>
+    ggplot(aes(x = neighbors, y = mean)) +
+    geom_point() +
+    geom_line() +
+    labs(x = "Number of neighbors", y = "Accuracy Estimate") +
+    ggtitle("Accuracy Estimates vs. Number of Neighbors")
+best_k_plot
 ```
 
-### TODO
-Using our ordinary model as well as the training data, we predict whether an article is popular or not. Then we use that along with the true values for the confusion matrix, which shows ...
+The value of K that generates the highest accuracy is about 50, therefore we choose K = 50 and use that to build the model.
 
 ```{r}
-#| vscode: {languageId: r}
-options(repr.plot.width = 8, repr.plot.height = 8)
-
-ROC_full_log <- roc(
-    response = training_articles$shares,
-    predictor = predict(article_logistic_regression, type = 'response')
-)
-
-plot(ROC_full_log,
-        print.auc = TRUE, col = 'blue', lwd = 3, lty = 2,
-        main = 'ROC Curves for Article Dataset'
-    )
+knn_spec <- nearest_neighbor(weight_func = "rectangular", neighbors = 50) |>
+    set_engine("kknn") |>
+    set_mode("classification")
+knn_spec
 ```
+
+Next, we use a workflow to fit our model using our training set, predict the labels in our testing set, and incorporate the predictions as the new column .pred_class into the testing set.
 
 ```{r}
-#| vscode: {languageId: r}
-auc_tibble <- tibble(Model = 'Full Model', AUC = as.double(ROC_full_log$auc))
-auc_tibble
+knn_fit <- workflow() |>
+    add_recipe(articles_recipe) |>
+    add_model(knn_spec) |>
+    fit(data = articles_training)
+
+articles_predict <- predict(knn_fit, articles_testing) |>
+    bind_cols(articles_testing)
 ```
 
-The AUC for the model is 0.709, meaning that there is 70.9% chance that our model will be able to identify between a popular and unpopular article.
-
-Since we have multiple attributes, we wish to find the most significant attributes that contribute the most to the amount of shares an article receives. We will do so using forward selection by way of the `tidymodels` package.
+We now look at the accuracy of the classifier using the testing set with the metrics function.
 
 ```{r}
-#| vscode: {languageId: r}
-model_mat_X_train <-
-    model.matrix(object = article_logistic_regression, data = training_articles)[, -1]
 
-model_mat_Y_train <-
-    as.matrix(training_articles$shares, ncol = 1)
+articles_accuracy <- articles_predict |>
+    metrics(truth = is_popular, estimate = .pred_class) |>
+    filter(.metric == "accuracy")
+
+articles_accuracy
 ```
+
+As can be seen, the accuracy of the classifier isn't very high at 54.6%. Below is the confusion matrix of the classifier model.
 
 ```{r}
-#| vscode: {languageId: r}
-articles_cv_lambda_lasso <- 
-    cv.glmnet(
-        x = model_mat_X_train, y = model_mat_Y_train,
-        alpha = 1,
-        family = 'binomial',
-        type.measure = 'auc',
-        nfolds = 5
-    )
-articles_cv_lambda_lasso
+confusion_matrix <- articles_predict |>
+    conf_mat(truth = is_popular, estimate = .pred_class)
+confusion_matrix
 ```
 
-```{r}
-#| vscode: {languageId: r}
-articles_lambda_1se_AUC_LASSO <- round(articles_cv_lambda_lasso$lambda.1se, 4)
-```
+Given that we care more about popular articles with higher shares, we take popular articles as the "positive" observations. The precision is therefore 0.6211 which is slightly higher than the accuracy of 0.546. The recall is 0.3844 which is significantly lower than the accuracy. This suggests that the model is somewhat precise in predicting popular articles but is cautious and misses some actual instances of popular articles in doing so.
 
-```{r}
-#| vscode: {languageId: r}
-articles_LASSO_1se_AUC <- glmnet(
- x = model_mat_X_train, y = model_mat_Y_train,
- alpha = 1,
- family = "binomial",
- lambda = articles_lambda_1se_AUC_LASSO
-)
+## Discussion:
+Summary: Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. Our findings suggest that the model is only somwhat reliable with an accuracy of 0.546 with precision higher than accuracy but recall lower than accuracy.
 
-sum((coef(articles_LASSO_1se_AUC)[, 1] != 0) == TRUE)
-```
+Are the findings as expected:
+TODO
 
-```{r}
-#| vscode: {languageId: r}
-auc_tibble <- auc_tibble |> add_row(Model = 'lasso', AUC = articles_cv_lambda_lasso$cvm[articles_cv_lambda_lasso$index["1se",]])
-```
+Impact of Findings:
+TODO
 
-```{r}
-#| vscode: {languageId: r}
-auc_tibble
-```
+Future Questions from Analysis:
+TODO
 
-The lasso model has slightly less area under the curve, however it uses 36 input variables instead of the 60 the full model uses, which is more efficient to compute.
-
-### Reference:
-
+## References
+Dataset Source: 
+- Online news popularity. UCI Machine Learning Repository. (2015, January). https://archive.ics.uci.edu/dataset/332/online+news+popularity 
 - López-Goñi, I., & Sánchez-Angulo, M. (2018). Social networks as a tool for science communication and public engagement: Focus on twitter. FEMS Microbiology Letters, 365(2), 1. https://doi.org/10.1093/femsle/fnx246
 - Luo, T., Freeman, C., & Stefaniak, J. (2020). “Like, comment, and share”—professional development through social media in higher education: A systematic review. Educational Technology Research and Development, 68(4), 1659-1683. https://doi.org/10.1007/s11423-020-09790-5
 - Oh, S., & Syn, S. Y. (2015). Motivations for sharing information and social support in social media: A comparative analysis of facebook, twitter, delicious, YouTube, and flickr. Journal of the Association for Information Science and Technology, 66(10), 2045-2060. https://doi.org/10.1002/asi.23320
