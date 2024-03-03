@@ -1,15 +1,26 @@
 ---
 title: Exploratory Data Analysis
 jupyter: ir
+format: 
+    html:
+        toc: true
+        toc-depth: 2
+    pdf:
+        toc: true
+        toc-depth: 2
+bibliography: references.bib
 ---
 
-### Introduction:
+# Title
+Predicting number of shares an article will get based on the number of links, images and videos in the article.
 
-Social media platforms, such as Twitter, have transformed the way in which information is disseminated and consumed on a global scale. These digital arenas enable a vast online community to quickly share and consume personal thoughts and professional insights, threaded through a variety of media forms. With over 500 million active users, Twitter has become particularly noteworthy for pinpointing the workings of information exchange and the features of content that make it most popular (López-Goñi & Sánchez-Angulo, 2018).
+## Introduction:
 
-In their research on user activity in Twitter, Oh and Syn (2015) posit that human behavior in everyday life is driven by many factors, and is thus complex and multi-faceted. They uncover a useful lens for examining user activity in casual online environments, while Luo et al.(2020) report that mobile technology which will exceed 12.3 billion devices by 2022, over 90% of which will be smartphones is increasingly prevalent. This underscores the increasing relevance of social media platforms in the everyday sharing and transmission of information.
+Social media platforms, such as Twitter, have transformed the way in which information is disseminated and consumed on a global scale. These digital arenas enable a vast online community to quickly share and consume personal thoughts and professional insights, threaded through a variety of media forms. With over 500 million active users, Twitter has become particularly noteworthy for pinpointing the workings of information exchange and the features of content that make it most popular @Ignacio.
 
-This research is fundamentally concerned with discerning the determinants of article popularity, as captured by the number of times each article was shared, to bring to light the many factors that drive user engagement and content diffusion. Using a massive dataset of articles and associated measures over a period of two years from Mashable to build models that could more accurately identify the traits that result in the visibility and engagement of content published to social media. By exploring the relationship between shared articles' characteristics and how popular they become, the hope is that this work may yield findings that offer guidance to both enterprise and solo publishers seeking to make their work more prevalent and persuasive in the digital enclave.
+In their research on user activity in Twitter, @Oh posit that human behavior in everyday life is driven by many factors, and is thus complex and multi-faceted. They uncover a useful lens for examining user activity in casual online environments, while @luo report that mobile technology which will exceed 12.3 billion devices by 2022, over 90% of which will be smartphones is increasingly prevalent. This underscores the increasing relevance of social media platforms in the everyday sharing and transmission of information.
+
+This research is fundamentally concerned with discerning the determinants of article popularity, as captured by the number of times each article was shared, to bring to light the many factors that drive user engagement and content diffusion. Using a massive dataset of articles and associated measures over a period of two years from Mashable (@Dataset) to build models that could more accurately identify the traits that result in the visibility and engagement of content published to social media. By exploring the relationship between shared articles' characteristics and how popular they become, the hope is that this work may yield findings that offer guidance to both enterprise and solo publishers seeking to make their work more prevalent and persuasive in the digital enclave.
 
 
 ```{r}
@@ -19,15 +30,9 @@ This research is fundamentally concerned with discerning the determinants of art
 # renv::restore()
 ```
 
-## Title
-Predicting number of shares an article will get based on the number of links, images and videos in the article.
 
 ## Summary
  Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. 
-
-## Introduction
-An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. The model aims to predict whether an article will be popular based on the number of links, images, and videos in it. 
-The dataset is publicly available and has 61 attributes out of which we chose 4 including the three predictors and the variable of interest, shares, which refers to the number of shares of the article in social networks.
 
 ## Methods and Results
 Loading relevant packages.
@@ -80,7 +85,7 @@ summary(articles$shares)
 sd(articles$shares)
 ```
 
-The variable of interest, shares, has a median of 1400 and a mean of 3395. The distribution spread is quite large, with a standard deviation of 11627. We will be using knn classification to determine whether an article will be popular. We will create a new variable called is_popular with two values 1 (popular) and 0 (unpopular)". An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares.
+The variable of interest, shares, has a median of 1400 and a mean of 3395. The distribution spread is quite large, with a standard deviation of 11627. We will be using knn classification to determine whether an article will be popular. We will create a new variable called is_popular with two values 1 (popular) and 0 (unpopular)". An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. The model aims to predict whether an article will be popular based on the number of links, images, and videos in it. The dataset is publicly available and has 61 attributes out of which we chose 4 including the three predictors and the variable of interest, shares, which refers to the number of shares of the article in social networks.
 
 ```{r}
 #| vscode: {languageId: r}
@@ -131,7 +136,7 @@ mean_hrefs_plot <- ggplot(articles_training, aes(x = num_hrefs, fill = is_popula
   labs(title = "Distribution of number of links", 
        x = "Number of links", 
        fill = "Popular")+
-       scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))  
+  scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))  
 
 
 # Histogram 1: Distribution of the number of images in article
@@ -140,7 +145,7 @@ mean_imgs_plot <- ggplot(articles_training, aes(x = num_imgs, fill = is_popular)
   labs(title = "Distribution of number of images", 
        x = "Number of images", 
        fill = "Popular")+
-       scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))        
+  scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))        
 
 
 # Histogram 1: Distribution of the number of videos in article
@@ -149,8 +154,8 @@ mean_videos_plot <- ggplot(articles_training, aes(x = num_videos, fill = is_popu
   labs(title = "Distribution of number of videos", 
        x = "Number of videos", 
        fill = "Popular")  +
-       scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))   
-``````
+  scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))   
+```
 
 ```{r}
 mean_hrefs_plot
@@ -289,10 +294,5 @@ Future Questions from Analysis:
 This analysis might lead to several Future questions. Firstly, whether there are more model models capable of achieving higher precision and recall. Secondly, the impact of the quality of links, images, and videos within articles on their popularity presents another area for in-depth investigation. 
 
 ## References
-Dataset Source: 
 
-- Online news popularity. UCI Machine Learning Repository. (2015, January). https://archive.ics.uci.edu/dataset/332/online+news+popularity 
-- López-Goñi, I., & Sánchez-Angulo, M. (2018). Social networks as a tool for science communication and public engagement: Focus on twitter. FEMS Microbiology Letters, 365(2), 1. https://doi.org/10.1093/femsle/fnx246
-- Luo, T., Freeman, C., & Stefaniak, J. (2020). “Like, comment, and share”—professional development through social media in higher education: A systematic review. Educational Technology Research and Development, 68(4), 1659-1683. https://doi.org/10.1007/s11423-020-09790-5
-- Oh, S., & Syn, S. Y. (2015). Motivations for sharing information and social support in social media: A comparative analysis of facebook, twitter, delicious, YouTube, and flickr. Journal of the Association for Information Science and Technology, 66(10), 2045-2060. https://doi.org/10.1002/asi.23320
 
