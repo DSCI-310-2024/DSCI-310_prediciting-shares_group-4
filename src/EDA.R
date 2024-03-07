@@ -31,6 +31,12 @@ main <- function(data, output){
     theme(axis.title = element_text(size = 20), axis.text = element_text(size = 15), title = element_text(size = 25))
     ggsave(filename = paste(output1, 'shares.png', sep = ''), shares_plot)
 
+    num_obs_training <- fullData |>
+      group_by(is_popular) |>
+      summarize(n = n()) |>
+      mutate(percentage = 100*n/nrow(fullData))
+    write_csv(num_obs_training, paste('data/', 'num_obs_training.csv', sep = ''))
+
     # Histogram 1: Distribution of the number of links in article
     mean_hrefs_plot <- ggplot(fullData, aes(x = num_hrefs, fill = is_popular)) +
     geom_histogram(color = "black", bins = 30) +

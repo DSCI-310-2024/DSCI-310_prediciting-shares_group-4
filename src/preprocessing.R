@@ -33,7 +33,6 @@ main <- function(data, output){
     testing_Data <- testing(data_split)
     write_csv(training_Data, paste(output1, 'training_Data.csv', sep = ''))
     write_csv(testing_Data, paste(output1, 'testing_Data.csv', sep = ''))
-    unlink(data1)
 }
 
 # code for other functions & tests goes here
