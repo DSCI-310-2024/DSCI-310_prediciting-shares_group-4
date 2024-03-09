@@ -12,3 +12,6 @@ RUN R -e "install.packages('renv', repos='http://cran.us.r-project.org')" \
     && R -e "install.packages('pROC', repos='http://cran.us.r-project.org')" \
     && R -e "install.packages('repr', repos='http://cran.us.r-project.org')" \
     && R -e "install.packages('glmnet', repos='http://cran.us.r-project.org')"
+
+# Open port 8888 for Jupyter
+EXPOSE  8888
