@@ -8,8 +8,10 @@ format:
     pdf:
         toc: true
         toc-depth: 2
+
 execute:
   echo: false
+
 bibliography: references.bib
 ---
 
@@ -55,22 +57,24 @@ We start our preliminary data analysis process by examining the number of observ
 temp <- read.csv('data/num_obs_training.csv')
 temp
 ```
+Table 1. Class distribution of article popularity in training set
+
 
 We can see that our data is balanced and since we have close percentages of data in both popular and unpopular classes, with popular holding the majority at 53.4%.
 
 Next, we visualize the distributions of our predictor variables: num_hrefs, num_imgs, and num_videos. We use is_popular as the fill argument.
 
+
 ### Number of links in popular and non-Popular articles
 ![Figure 2. Histogram of number of links in popular and non-Popular articles](figs/links.png)
+
 
 ### Number of images in popular and non-Popular articles
 ![Figure 3. Histogram of number of images in popular and non-Popular articles](figs/images.png)
 
+
 ### Number of videos in popular and non-Popular articles
 ![Figure 4. Histogram of number of videos in popular and non-Popular articles](figs/videos.png)
-
-
-Next, we start building our knn classification model.
 
 Next, we start building our knn classification model and we build a tuning model for picking the best value of k. Then we perform cross-validation and create a workflow that calculate the metrics for each of the K values 1, 6, ..., 100 then make an accuracy vs k plot.
 
@@ -87,6 +91,7 @@ We now look at the accuracy of the classifier using the testing set with the met
 #| tbl-cap: Summary of KNN model accuracy across different K values with 5-fold cross-validation
 temp2 <- read.csv('data/model_accuracy.csv')
 ```
+Table 3. Classifier testing set accuracy
 
 As can be seen, the accuracy of the classifier isn't very high at 54.6%. Below is the confusion matrix of the classifier model.
 
@@ -96,6 +101,7 @@ As can be seen, the accuracy of the classifier isn't very high at 54.6%. Below i
 conf_mat <- readRDS('src/objects/conf_mat.rds')
 conf_mat
 ```
+Table 4. Confusion matrix of Aarticle popularity predictions on test data
 
 Given that we care more about popular articles with higher shares, we take popular articles as the "positive" observations. The precision is therefore 0.6211 which is slightly higher than the accuracy of 0.546. The recall is 0.3844 which is significantly lower than the accuracy. This suggests that the model is somewhat precise in predicting popular articles but is cautious and misses some actual instances of popular articles in doing so.
 
@@ -112,3 +118,4 @@ Future Questions from Analysis:
 This analysis might lead to several Future questions. Firstly, whether there are more model models capable of achieving higher precision and recall. Secondly, the impact of the quality of links, images, and videos within articles on their popularity presents another area for in-depth investigation. 
 
 ## References
+
