@@ -8,6 +8,10 @@ format:
     pdf:
         toc: true
         toc-depth: 2
+
+execute:
+  echo: false
+
 bibliography: references.bib
 ---
 
@@ -35,92 +39,23 @@ This research is fundamentally concerned with discerning the determinants of art
  Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. 
 
 ## Methods and Results
-Loading relevant packages.
-```{r}
-#| vscode: {languageId: r}
-library(kknn)
-library(renv)
-library(tidymodels)
-library(tidyverse)
-library(repr)
-
-```
-
-Reading data from dataset.
-```{r}
-#| vscode: {languageId: r}
-url <- "https://archive.ics.uci.edu/static/public/332/online+news+popularity.zip"
-download.file(url,"articles.zip")
-temp_zip <- tempfile()
-download.file(url, temp_zip)
-# Unzip the file in the data directory
-unzip(temp_zip, exdir = "data/")
-# Cleanup: Remove the temporary zip file
-unlink(temp_zip)
-directories <- list.dirs("data/", recursive = FALSE)
-
-# List the files within the first directory, filtering for CSV files
-csv_files <- list.files(directories[1], pattern = "\\.csv$", full.names = TRUE)
-
-articles <- read.csv(csv_files, header = TRUE)
-
-```
-
-Creating a boxplot of the variable of interest
-```{r}
-#| vscode: {languageId: r}
-ggplot(data = articles) +
-    geom_boxplot(aes(y = shares)) +
-    labs(title = "Boxplot of Shares") +
-    ylab(label = 'Shares') +
-    theme(axis.title = element_text(size = 20), axis.text = element_text(size = 15), title = element_text(size = 25))
-```
-Figure 1. Boxplot of the variable of interest, shares
 
 
-Obtaining summary statistics about the variable of interest.
-```{r}
-#| vscode: {languageId: r}
-summary(articles$shares)
-sd(articles$shares)
-```
+### Boxplot of Shares
+![Figure 1. Boxplot of the variable of interest.](figs/shares.png)
 
 The variable of interest, shares, has a median of 1400 and a mean of 3395. The distribution spread is quite large, with a standard deviation of 11627. We will be using knn classification to determine whether an article will be popular. We will create a new variable called is_popular with two values 1 (popular) and 0 (unpopular)". An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. The model aims to predict whether an article will be popular based on the number of links, images, and videos in it. The dataset is publicly available and has 61 attributes out of which we chose 4 including the three predictors and the variable of interest, shares, which refers to the number of shares of the article in social networks.
 
-```{r}
-#| vscode: {languageId: r}
-articles_clean <- articles |>
-      select(shares, num_hrefs, num_imgs, num_videos) |>
-      mutate(is_popular = ifelse(shares < 1400, 0, 1)) |>
-      mutate(is_popular = as.factor(is_popular))
-
-head(articles_clean)
-```
-
-```{r}
-#| vscode: {languageId: r}
-write.csv(articles_clean, 'data/clean_Articles.csv')
-```
 
 Since we will be performing classification, we split our data into a training and a testing set with a 60% proportion.
-```{r}
-#| vscode: {languageId: r}
-set.seed(2024)
-
-articles_data_split <- initial_split(articles_clean, prop = 0.6, strata = is_popular)
-articles_training <- training(articles_data_split)
-articles_testing <- testing(articles_data_split)
-```
 
 We start our preliminary data analysis process by examining the number of observations we have in the training set for each class.
 
 ```{r}
-num_obs_training <- articles_training |>
-      group_by(is_popular) |>
-      summarize(n = n()) |>
-      mutate(percentage = 100*n/nrow(articles_training))
-
-num_obs_training
+#| label: num_obs
+#| tbl-cap: Class distribution of article popularity in training set
+temp <- read.csv('data/num_obs_training.csv')
+temp
 ```
 Table 1. Class distribution of article popularity in training set
 
@@ -129,153 +64,42 @@ We can see that our data is balanced and since we have close percentages of data
 
 Next, we visualize the distributions of our predictor variables: num_hrefs, num_imgs, and num_videos. We use is_popular as the fill argument.
 
-```{r}
-# Histogram 1: Distribution of the number of links in article
-mean_hrefs_plot <- ggplot(articles_training, aes(x = num_hrefs, fill = is_popular)) +
-  geom_histogram(color = "black") +
-  labs(title = "Distribution of number of links", 
-       x = "Number of links", 
-       fill = "Popular")+
-  scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))  
+
+### Number of links in popular and non-Popular articles
+![Figure 2. Histogram of number of links in popular and non-Popular articles](figs/links.png)
 
 
-# Histogram 1: Distribution of the number of images in article
-mean_imgs_plot <- ggplot(articles_training, aes(x = num_imgs, fill = is_popular)) +
-  geom_histogram(color = "black") +
-  labs(title = "Distribution of number of images", 
-       x = "Number of images", 
-       fill = "Popular")+
-  scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))        
+### Number of images in popular and non-Popular articles
+![Figure 3. Histogram of number of images in popular and non-Popular articles](figs/images.png)
 
 
-# Histogram 1: Distribution of the number of videos in article
-mean_videos_plot <- ggplot(articles_training, aes(x = num_videos, fill = is_popular)) +
-  geom_histogram(color = "black") +
-  labs(title = "Distribution of number of videos", 
-       x = "Number of videos", 
-       fill = "Popular")  +
-  scale_fill_discrete(name = "is_popular", labels = c("Unpopular", "Popular"))   
-```
+### Number of videos in popular and non-Popular articles
+![Figure 4. Histogram of number of videos in popular and non-Popular articles](figs/videos.png)
 
-```{r}
-mean_hrefs_plot
-```
-Figure 2. Histogram of number of links in popular and non-Popular articles
+Next, we start building our knn classification model and we build a tuning model for picking the best value of k. Then we perform cross-validation and create a workflow that calculate the metrics for each of the K values 1, 6, ..., 100 then make an accuracy vs k plot.
 
+### Accuracy vs k plot
+![Figure 4.  Results from 5-fold cross validation to choose K. (Accuracy was used as the classification metric as K was varied.)](figs/best_k.png)
 
+The value of K that generates the highest accuracy is about 50, therefore we choose K = 50 and use that to build the model.We use a workflow to fit our model using our training set, predict the labels in our testing set, and incorporate the predictions as the new column .pred_class into the testing set.
 
-```{r}
-mean_imgs_plot
-```
-Figure 3. Histogram of number of images in popular and non-Popular articles
-
-
-
-
-```{r}
-mean_videos_plot
-```
-Figure 4. Histogram of number of videos in popular and non-Popular articles
-
-
-Next, we start building our knn classification model.
-
-We start with making a recipe using the training data.
-```{r}
-articles_recipe <- recipe(is_popular ~ num_hrefs + num_imgs + num_videos, data = articles_training) |>
-    step_scale(all_predictors()) |>
-    step_center(all_predictors())
-articles_recipe
-```
-
-Next, we build a tuning model for picking the best value of k.
-
-```{r}
-tune_spec <- nearest_neighbor(weight_func = "rectangular", neighbors = tune()) |>
-    set_engine("kknn") |>
-    set_mode("classification")
-```
-
-Next, we perform cross-validation and create a workflow that calculate the metrics for each of the K values 1, 6, ..., 46, and then return a data frame that shows the accuracy of each K value.
-
-```{r}
-set.seed(2023) # set the seed
-
-# cross-validation
-articles_vfold <- vfold_cv(articles_training, v = 5, strata = is_popular)
-
-# create a set of K values
-kvals <- tibble(neighbors = seq(from = 1, to = 100, by = 5))
-
-# data analysis workflow                       
-    knn_results <- workflow() |>
-    add_recipe(articles_recipe) |>
-    add_model(tune_spec) |>
-    tune_grid(resamples = articles_vfold, grid = kvals) |>
-    collect_metrics()
-
-accuracies <- knn_results |>
-    filter(.metric == "accuracy")
-
-print(accuracies)
-```
-Table 2. Summary of KNN model accuracy across different K values with 5-fold cross-validation
-
-
-
-We now work on making an accuracy vs k plot.
-
-```{r}
-best_k_plot <- accuracies |>
-    ggplot(aes(x = neighbors, y = mean)) +
-    geom_point() +
-    geom_line() +
-    labs(x = "Number of neighbors", y = "Accuracy Estimate") +
-    ggtitle("Accuracy Estimates vs. Number of Neighbors")
-best_k_plot
-```
-Figure 4.  Results from 5-fold cross validation to choose K. (Accuracy was used as the classification metric as K was varied.)
-
-
-The value of K that generates the highest accuracy is about 50, therefore we choose K = 50 and use that to build the model.
-
-```{r}
-knn_spec <- nearest_neighbor(weight_func = "rectangular", neighbors = 50) |>
-    set_engine("kknn") |>
-    set_mode("classification")
-knn_spec
-```
-
-Next, we use a workflow to fit our model using our training set, predict the labels in our testing set, and incorporate the predictions as the new column .pred_class into the testing set.
-
-```{r}
-knn_fit <- workflow() |>
-    add_recipe(articles_recipe) |>
-    add_model(knn_spec) |>
-    fit(data = articles_training)
-
-articles_predict <- predict(knn_fit, articles_testing) |>
-    bind_cols(articles_testing)
-```
 
 We now look at the accuracy of the classifier using the testing set with the metrics function.
 
 ```{r}
-
-articles_accuracy <- articles_predict |>
-    metrics(truth = is_popular, estimate = .pred_class) |>
-    filter(.metric == "accuracy")
-
-articles_accuracy
+#| label: accuracy
+#| tbl-cap: Summary of KNN model accuracy across different K values with 5-fold cross-validation
+temp2 <- read.csv('data/model_accuracy.csv')
 ```
 Table 3. Classifier testing set accuracy
 
 As can be seen, the accuracy of the classifier isn't very high at 54.6%. Below is the confusion matrix of the classifier model.
 
 ```{r}
-confusion_matrix <- articles_predict |>
-    conf_mat(truth = is_popular, estimate = .pred_class)
-confusion_matrix
+#| label: conf_mat
+#| tbl-cap: Confusion matrix of Aarticle popularity predictions on test data
+conf_mat <- readRDS('src/objects/conf_mat.rds')
+conf_mat
 ```
 Table 4. Confusion matrix of Aarticle popularity predictions on test data
 
@@ -294,5 +118,4 @@ Future Questions from Analysis:
 This analysis might lead to several Future questions. Firstly, whether there are more model models capable of achieving higher precision and recall. Secondly, the impact of the quality of links, images, and videos within articles on their popularity presents another area for in-depth investigation. 
 
 ## References
-
 
