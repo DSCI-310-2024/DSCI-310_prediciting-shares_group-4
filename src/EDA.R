@@ -24,6 +24,12 @@ main <- function(data, output){
 
     fullData <- fullData |> mutate(is_popular = as.factor(is_popular))
 
+    share_summary <- data.frame(
+        Mean = round(mean(fullData$shares),0),
+        SD = round(sd(fullData$shares),0),
+        Median = round(median(fullData$shares),0))
+    write_csv(share_summary, paste('data/', 'share_summary.csv', sep = ''))
+
     shares_plot <- ggplot(data = fullData) +
     geom_boxplot(aes(y = shares)) +
     labs(title = "Boxplot of Shares") +

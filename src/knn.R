@@ -87,6 +87,24 @@ main <- function(data, output){
     saveRDS(confusion_matrix, paste(output1, 'objects/conf_mat.rds', sep = ''))
 
 
+    TP <- confusion_matrix$table[2, 2]  
+    FP <- confusion_matrix$table[2, 1]  
+    FN <- confusion_matrix$table[1, 2]
+    TN <- confusion_matrix$table[1, 1]  
+
+    knn_precision <- TP / (TP + FP)
+    knn_recall <- TP / (TP + FN)
+    knn_accuracy <- (TP + TN) / (TP + FP + FN + TN)
+
+    conf_mat_summary <- data.frame(
+      Precision = round(knn_precision,4),
+      Recall = round(knn_recall,4),
+      Accuracy = round(knn_accuracy,4))
+    write_csv(conf_mat_summary, paste('data/', 'conf_mat_summary.csv', sep = ''))
+
+
+
+
 }
 
 # code for other functions & tests goes here
