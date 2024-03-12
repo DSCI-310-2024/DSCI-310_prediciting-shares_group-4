@@ -20,6 +20,17 @@ To finish up this project you will need to install:
     -   `GGally`
 -   Quarto
 
+### Makefile
+
+Runs the complete analysis all the way from reading and cleaning data to creating training and testing sets, creating a workflow fit on the training data and eventually predicting shares and looking at the model accuracy using testing data.
+
+Renders the prediction report from the .qmd file into an HTML format and saves it to the docs folder.
+
+Using the Makefile:
+
+- Run the analysis: Running make all at the command line will run the analysis easily from top to bottom
+- Undo the analysis: Running make clean at the command line will undo the analysis and delete all generated data and files
+
 ### Licenses
 
 The software content of this template repository licensed under the [MIT License](https://spdx.org/licenses/MIT.html). See the [license file](LICENSE.md) for more information.
