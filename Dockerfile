@@ -12,3 +12,4 @@ RUN R -e "install.packages('renv', repos='http://cran.us.r-project.org')" \
     && R -e "install.packages('pROC', repos='http://cran.us.r-project.org')" \
     && R -e "install.packages('repr', repos='http://cran.us.r-project.org')" \
     && R -e "install.packages('glmnet', repos='http://cran.us.r-project.org')"
+
