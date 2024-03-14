@@ -25,12 +25,14 @@ figs/images.png figs/links.png figs/shares.png figs/videos.png data/num_obs_trai
 	Rscript src/EDA.R --data=data/training_data.csv \
 		--output=figs/
 
-# Runs the knn.R script to define the recipe, specification, perform cross-validation, choose best k value after
+# Runs the workflow.R script to define the recipe, specification, perform cross-validation, choose best k value after
 # looking at the best k plot, re-defining the specification based on the best k value and fitting the training data.
-# Finally, the workflow is tested on the testing data and the confusion matrix and accuracy are considered.
-src/objects/conf_mat.rds data/model_accuracy.csv	:	src/knn.R data/training_data.csv
-	Rscript src/knn.R --data=data/training_data.csv \
-		--output=src/
+src/objects/knn_fit.rds :	src/workflow.R data/training_data.csv
+	Rscript src/workflow.R --data=data/training_data.csv --output=src/
+
+# Runs the knn.R script to test the workflow on testing data and the confusion matrix and model accuracy are considered.
+src/objects/conf_mat.rds data/model_accuracy.csv	:	src/knn.R src/objects/knn_fit.rds
+	Rscript src/knn.R --workflow=src/objects/knn_fit.rds --output=src/
 
 # Saves the prediction report to the docs folder after rendering it from the prediction_report.qmd file
 # generated from its dependencies
