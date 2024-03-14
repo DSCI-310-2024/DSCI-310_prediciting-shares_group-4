@@ -1,5 +1,5 @@
-# Use an official Jupyter image with R
-FROM jupyter/r-notebook:latest
+# Use an official Miniconda image
+FROM continuumio/miniconda3
 
 # Install R packages
 RUN R -e "install.packages('renv', repos='http://cran.us.r-project.org')" \
