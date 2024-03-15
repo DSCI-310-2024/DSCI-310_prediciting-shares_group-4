@@ -1,6 +1,9 @@
 # Use an official Jupyter image with R
 FROM jupyter/r-notebook:latest
 
+# Install GNUMake to run Makefile
+RUN apt install make
+
 # Install R packages
 RUN conda install -y \
     r-ggally=2.2.1 \
