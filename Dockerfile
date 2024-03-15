@@ -5,8 +5,7 @@ USER root
 
 # Install GNUMake to run Makefile
 RUN sudo -S \
-    apt install --yes --no-install-recommends \
-    make
+    apt-get update && apt-get install make
 
 
 # Install R packages
