@@ -20,3 +20,4 @@ RUN mamba install --yes \
     'r-pROC=1.18.5' \
     'r-repr=1.1.6'
 
+User root
