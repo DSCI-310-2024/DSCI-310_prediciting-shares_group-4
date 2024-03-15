@@ -5,7 +5,7 @@ USER root
 
 # Install GNUMake to run Makefile
 RUN sudo -S \
-    apt-get update && apt-get install -Y \
+    apt-get update && apt-get install -y \
     make \
     gdebi
 
