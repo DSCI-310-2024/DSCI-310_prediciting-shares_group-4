@@ -5,7 +5,7 @@ FROM jupyter/r-notebook:latest
 RUN apt install make
 
 # Install R packages
-RUN conda install -y \
+RUN conda install -c -y r \
     r-tidyverse=2.0.0 \
     r-tidymodels=1.1.1 \
     r-ggally=2.2.1 \
