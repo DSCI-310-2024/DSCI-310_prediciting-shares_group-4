@@ -2,7 +2,7 @@
 FROM jupyter/r-notebook:latest
 
 # Install R packages
-RUN mamba install --yes \
+RUN mamba install -n base --yes \
     'r-docopt' \
     'r-ggally=2.2.1' \
     'r-leaps=3.1' \
