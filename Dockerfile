@@ -18,6 +18,7 @@ RUN mamba install --yes \
     'r-leaps=3.1' \
     'r-boot=1.3-30' \
     'r-pROC=1.18.5' \
-    'r-repr=1.1.6'
-
-User root
+    'r-repr=1.1.6' && \
+    mamba clean --all -f -y && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
