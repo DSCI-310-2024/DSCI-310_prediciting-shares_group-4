@@ -5,7 +5,7 @@ USER root
 
 # Install GNUMake to run Makefile
 RUN sudo -S \
-    apt-get install --yes --no-install-recommends \
+    apt install --yes --no-install-recommends \
     make
 
 
