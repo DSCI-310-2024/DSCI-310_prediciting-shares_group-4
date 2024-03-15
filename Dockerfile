@@ -1,17 +1,9 @@
 # Use an official Jupyter image with R
 FROM jupyter/r-notebook:latest
 
+USER ${NB_UID}
 # Install R packages
-RUN mamba install -n base --yes \
-    'r-docopt' \
-    'r-ggally=2.2.1' \
-    'r-leaps=3.1' \
-    'r-boot=1.3-30' \
-    'r-pROC=1.18.5' \
-    'r-repr=1.1.6' && \
-    mamba clean --all -f -y && \
-    fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}"
+RUN mamba install --yes 'r-docopt'
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
