@@ -2,7 +2,7 @@
 FROM jupyter/r-notebook:latest
 
 # Install R packages
-RUN R -e "install.packages('https://cran.r-project.org/src/contrib/docopt_0.7.1.tar.gz', repos=NULL, type = 'source')
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/docopt_0.7.1.tar.gz', repos=NULL, type = 'source')"
 
 USER root
 # Install GNUMake to run Makefile
