@@ -1,6 +1,8 @@
 # Use an official Jupyter image with R
 FROM jupyter/r-notebook:latest
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 USER root
 
 # Install GNUMake to run Makefile
