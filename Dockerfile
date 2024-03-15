@@ -2,7 +2,8 @@
 FROM jupyter/r-notebook:latest
 
 # Install GNUMake to run Makefile
-RUN apt-get install --yes --no-install-recommends \
+RUN sudo -s \
+    apt-get install --yes --no-install-recommends \
     make
 
 
