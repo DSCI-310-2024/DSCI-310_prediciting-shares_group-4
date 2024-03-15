@@ -2,7 +2,8 @@
 FROM jupyter/r-notebook:latest
 
 # Install GNUMake to run Makefile
-RUN sudo apt install make
+RUN apt-get install --yes --no-install-recommends \
+    make
 
 
 # Install R packages
