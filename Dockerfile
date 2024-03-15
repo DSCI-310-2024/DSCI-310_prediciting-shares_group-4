@@ -6,6 +6,8 @@ RUN apt install make
 
 # Install R packages
 RUN conda install -y \
+    r-tidyverse=2.0.0 \
+    r-tidymodels=1.1.1 \
     r-ggally=2.2.1 \
     r-leaps=3.1 \
     r-boot=1.3-30 \
