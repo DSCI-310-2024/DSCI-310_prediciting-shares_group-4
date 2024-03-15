@@ -9,6 +9,7 @@ USER root
 RUN sudo -S \
     apt-get update && apt-get install make
 
+USER ${NB_UID}
 
 # Install R packages
 RUN mamba install --yes \
