@@ -1,8 +1,6 @@
 # Use an official Jupyter image with R
 FROM jupyter/r-notebook:latest
 
-USER ${NB_UID}
-
 # Install R packages
 RUN mamba install --yes \
     'r-docopt=0.7.1' \
