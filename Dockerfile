@@ -1,6 +1,8 @@
 # Use an official Jupyter image with R
 FROM jupyter/r-notebook:latest
 
+USER root
+
 # Install GNUMake to run Makefile
 RUN sudo -S \
     apt-get install --yes --no-install-recommends \
