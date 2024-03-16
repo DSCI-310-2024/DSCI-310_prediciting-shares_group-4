@@ -44,7 +44,7 @@ This research is fundamentally concerned with discerning the determinants of art
 
 
 ### Boxplot of Shares
-![Figure 1. Boxplot of the variable of interest.](figs/shares.png)
+![Boxplot of the variable of interest.](figs/shares.png){#fig-shares-plot width=80%}
 
 ```{r}
 share_summary <- read.csv('data/share_summary.csv')
@@ -59,40 +59,38 @@ Since we will be performing classification, we split our data into a training an
 We start our preliminary data analysis process by examining the number of observations we have in the training set for each class.
 
 ```{r}
-#| label: num_obs
+#| label: tbl-num_obs
 #| tbl-cap: Class distribution of article popularity in training set
 #| 
 temp <- read.csv('data/num_obs_training.csv')
 pop_percentage <- round((as.numeric(temp[2,'percentage'])), 1)
-temp
+knitr::kable(temp)
 
 ```
 
 
-Table 1. Class distribution of article popularity in training set
 
 
 
-We can see that our data is balanced and since we have close percentages of data in both popular and unpopular classes, with popular holding the majority at `{r} pop_percentage` %. 
+According to @tbl-num_obs, We can see that our data is balanced and since we have close percentages of data in both popular and unpopular classes, with popular holding the majority at `{r} pop_percentage` %. 
 
 Next, we visualize the distributions of our predictor variables: num_hrefs, num_imgs, and num_videos. We use is_popular as the fill argument.
 
 
-### Number of links in popular and non-Popular articles
-![Figure 2. Histogram of number of links in popular and non-Popular articles](figs/links.png)
+::: {layout-ncol=3}
+![Histogram of number of links in popular and non-Popular articles](figs/links.png){#fig-num_links}
+
+![Histogram of number of images in popular and non-Popular articles](figs/images.png){#fig-num_images}
 
 
-### Number of images in popular and non-Popular articles
-![Figure 3. Histogram of number of images in popular and non-Popular articles](figs/images.png)
+![Histogram of number of videos in popular and non-Popular articles](figs/videos.png){#fig-num_videos}
 
-
-### Number of videos in popular and non-Popular articles
-![Figure 4. Histogram of number of videos in popular and non-Popular articles](figs/videos.png)
+:::
 
 Next, we start building our knn classification model and we build a tuning model for picking the best value of k. Then we perform cross-validation and create a workflow that calculate the metrics for each of the K values 1, 6, ..., 100 then make an accuracy vs k plot.
 
 ### Accuracy vs k plot
-![Figure 4.  Results from 5-fold cross validation to choose K. (Accuracy was used as the classification metric as K was varied.)](figs/best_k.png)
+![Results from 5-fold cross validation to choose K. (Accuracy was used as the classification metric as K was varied.)](figs/best_k.png){#fig-best-k-plot width=80%}
 
 The value of K that generates the highest accuracy is about 50, therefore we choose K = 50 and use that to build the model.We use a workflow to fit our model using our training set, predict the labels in our testing set, and incorporate the predictions as the new column .pred_class into the testing set.
 
@@ -100,24 +98,24 @@ The value of K that generates the highest accuracy is about 50, therefore we cho
 We now look at the accuracy of the classifier using the testing set with the metrics function.
 
 ```{r}
-#| label: accuracy
+#| label: tbl-accuracy
 #| tbl-cap: Summary of KNN model accuracy across different K values with 5-fold cross-validation
 temp2 <- read.csv('data/model_accuracy.csv')
 model_accuracy <- round((temp2[".estimate"]*100),1)
-temp2
+knitr::kable(temp2)
 ```
-Table 3. Classifier testing set accuracy
 
-As can be seen, the accuracy of the classifier isn't very high at `{r} model_accuracy`%. Below is the confusion matrix of the classifier model.
+
+According to @tbl-accuracy, the accuracy of the classifier isn't very high at `{r} model_accuracy`%. Below is the confusion matrix of the classifier model.
 
 ```{r}
-#| label: conf_mat
+#| label: tbl-conf_mat
 #| tbl-cap: Confusion matrix of Aarticle popularity predictions on test data
 conf_mat <- readRDS('src/objects/conf_mat.rds')
-conf_mat
+knitr::kable(conf_mat$table)
 
 ```
-Table 4. Confusion matrix of Aarticle popularity predictions on test data
+
 
 ```{r}
 
@@ -125,7 +123,7 @@ conf_mat_summary <- read.csv('data/conf_mat_summary.csv')
 
 ```
 
-Given that we care more about popular articles with higher shares, we take popular articles as the "positive" observations. The precision is therefore `{r} conf_mat_summary["Precision"]`  which is slightly higher than the accuracy of `{r} conf_mat_summary["Accuracy"]`. The recall is `{r} conf_mat_summary["Recall"]` which is significantly lower than the accuracy. This suggests that the model is somewhat precise in predicting popular articles but is cautious and misses some actual instances of popular articles in doing so.
+Given that we care more about popular articles with higher shares, we take popular articles as the "positive" observations. So the true positive is `{r} conf_mat_summary["TP"]` and the false positive is `{r} conf_mat_summary["FP"]`. The precision is therefore `{r} conf_mat_summary["Precision"]`  which is slightly higher than the accuracy of `{r} conf_mat_summary["Accuracy"]`. The recall is `{r} conf_mat_summary["Recall"]` which is significantly lower than the accuracy. This suggests that the model is somewhat precise in predicting popular articles but is cautious and misses some actual instances of popular articles in doing so.
 
 ## Discussion:
 Summary: Our analysis aims to predict the number of shares an article published by Mashable over a period of two years will get based on the number of links, images and videos in the article using knn classification. An article is classified as popular if it has equal to or more than 1400 shares and unpopular if it has less than 1400 shares. Our findings suggest that the model is only somwhat reliable with an accuracy of `{r} conf_mat_summary["Accuracy"]` with precision higher than accuracy but recall lower than accuracy.
