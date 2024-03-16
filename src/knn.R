@@ -51,7 +51,9 @@ main <- function(output, workflow){
     conf_mat_summary <- data.frame(
       Precision = round(knn_precision,4),
       Recall = round(knn_recall,4),
-      Accuracy = round(knn_accuracy,4))
+      Accuracy = round(knn_accuracy,4),
+      TP=TP,
+      FP=FP)
     write_csv(conf_mat_summary, paste('data/', 'conf_mat_summary.csv', sep = ''))
 
 }
