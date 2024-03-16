@@ -7,7 +7,7 @@ name: Publish Docker image
 on: 
   push: 
     branches:
-      - DockerfileEdit
+      - main
     paths: 
       - 'Dockerfile'
 
