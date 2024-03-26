@@ -14,8 +14,6 @@
 #' 
 
 suppressMessages(library(tidyverse))
-suppressWarnings(library(docopt))
-suppressWarnings(library(ggplot2))
 
 
 make_histogram <- function(data_frame, xvar, yvar, hist_title, xlabel) {
@@ -52,7 +50,8 @@ make_histogram <- function(data_frame, xvar, yvar, hist_title, xlabel) {
   histogram <- ggplot(data_frame, aes(x = xvar, fill = yvar)) +
     geom_histogram(color = "black", bins = 30) +
     labs(title = hist_title, 
-        x = xlabel)
+        x = xlabel,
+        fill = "Popular")
 
   return(histogram)
 }
