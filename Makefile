@@ -21,7 +21,7 @@ data/clean_data.csv data/training_data.csv data/testing_data.csv	:	src/preproces
 
 
 # Runs the EDA.R script to create the figures (boxplot and histograms) and saves them in the figs folder
-figs/images.png figs/links.png figs/shares.png figs/videos.png data/num_obs_training.csv	:	src/EDA.R	data/training_data.csv
+figs/images.png figs/links.png figs/shares.png figs/videos.png data/num_obs_training.csv	:	src/EDA.R data/training_data.csv
 	Rscript src/EDA.R --data=data/training_data.csv \
 		--output=figs/
 

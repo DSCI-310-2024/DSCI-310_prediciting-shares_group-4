@@ -11,6 +11,7 @@ Options:
 # import libraries/packages
 suppressMessages(library(tidyverse))
 suppressWarnings(library(docopt))
+suppressWarnings(source("R/histograms.R"))
 
 # parse/define command line arguments here
 opt <- docopt(doc)
@@ -44,27 +45,18 @@ main <- function(data, output){
     write_csv(num_obs_training, paste('data/', 'num_obs_training.csv', sep = ''))
 
     # Histogram 1: Distribution of the number of links in article
-    mean_hrefs_plot <- ggplot(fullData, aes(x = num_hrefs, fill = is_popular)) +
-    geom_histogram(color = "black", bins = 30) +
-    labs(title = "Distribution of number of links", 
-        x = "Number of links", 
-        fill = "Popular")
+    mean_hrefs_plot <- make_histogram(fullData, "num_hrefs", "is_popular",  # nolint
+    "Distribution of number of links", "Number of Links")
     ggsave(filename = paste(output1, 'links.png', sep = ''), mean_hrefs_plot)
 
     # Histogram 2: Distribution of the number of images in article  
-    mean_imgs_plot <- ggplot(fullData, aes(x = num_imgs, fill = is_popular)) +
-    geom_histogram(color = "black", bins = 30) +
-    labs(title = "Distribution of number of images", 
-        x = "Number of images", 
-        fill = "Popular")
-    ggsave(filename = paste(output1, 'images.png', sep = ''), mean_imgs_plot)
+    mean_imgs_plot <- make_histogram(fullData, "num_imgs", "is_popular",  # nolint
+    "Distribution of number of Images", "Number of Images")
+    ggsave(filename = paste(output1, 'images.png', sep = ''),  mean_imgs_plot)
 
     # Histogram 3: Distribution of the number of videos in article
-    mean_videos_plot <- ggplot(fullData, aes(x = num_videos, fill = is_popular)) +
-    geom_histogram(color = "black", bins = 30) +
-    labs(title = "Distribution of number of videos", 
-        x = "Number of videos", 
-        fill = "Popular")
+    mean_videos_plot <- make_histogram(fullData, "num_videos", "is_popular",  # nolint
+    "Distribution of number of Videos", "Number of Videos")
     ggsave(filename = paste(output1, 'videos.png', sep = ''), mean_videos_plot)
 }
 
