@@ -22,10 +22,11 @@ main <- function(data, output){
     data1 <- toString(data)
     output1 <- toString(output)
     fullData <- suppressMessages(read_csv(data1))
+    required_columns <- c("shares", "num_hrefs", "num_imgs", "num_videos")
     clean_Data <- fullData |>
-      select(shares, num_hrefs, num_imgs, num_videos) |>
-      mutate(is_popular = ifelse(shares < 1400, 0, 1)) |>
-      mutate(is_popular = as.factor(is_popular))
+      dplyr::select(all_of(required_columns)) |>
+      dplyr::mutate(is_popular = ifelse(shares < 1400, 0, 1),
+                    is_popular = as.factor(is_popular))
     write_csv(clean_Data, paste(output1, 'clean_Data.csv', sep = ''))
     set.seed(2024)
     data_split <- initial_split(clean_Data, prop = 0.6, strata = is_popular)

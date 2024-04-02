@@ -21,6 +21,11 @@ clean_data <- function(data_frame){
     stop("The data frame should not be empty")
   }
 
+  if (sum(is.na(data_frame)) > 0) {
+    stop("data_frame shouldn't contain null values")
+  }
+
+
   clean_data_frame <- data_frame |>
     dplyr::select(all_of(required_columns)) |>
     dplyr::mutate(is_popular = ifelse(shares < 1400, 0, 1),
