@@ -20,15 +20,11 @@ To finish up this project you will need to install:
 
 To use dockerfile, first download the release and extract it on your drive. Then using a CLI (Command line interface), set the release to be your current directory. Then use the follwing to run the dockerfile:
 
-```
-docker run --rm -it -v /$(pwd):/home/jovyan/project --entrypoint=bash hyud/dsci-310_predicting-shares_group-4:main
-```
+`docker run --rm -it -v /$(pwd):/home/jovyan/project --entrypoint=bash hyud/dsci-310_predicting-shares_group-4:main`
 
 Once you are in the container, use the following to access the release within the container:
 
-```
-cd project
-```
+`cd project`
 
 
 ### Makefile
