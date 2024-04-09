@@ -20,11 +20,15 @@ To finish up this project you will need to install:
 
 To use dockerfile, first download the release and extract it on your drive. Then using a CLI (Command line interface), set the release to be your current directory. Then use the follwing to run the dockerfile:
 
-`docker run --rm -it -v /$(pwd):/home/jovyan/project --entrypoint=bash hyud/dsci-310_predicting-shares_group-4:main`
+```
+docker run --rm -it -v /$(pwd):/home/jovyan/project --entrypoint=bash hyud/dsci-310_predicting-shares_group-4:main
+```
 
 Once you are in the container, use the following to access the release within the container:
 
-`cd project`
+```
+cd project
+```
 
 
 ### Makefile
@@ -35,9 +39,22 @@ Renders the prediction report from the .qmd file into an HTML format and saves i
 
 Using the Makefile:
 
+- Clean first with below code
+```
+make clean
+```
 - Run the analysis: Running make all at the command line will run the analysis easily from top to bottom
+```
+make all
+```
 - Undo the analysis: Running make clean at the command line will undo the analysis and delete all generated data and files
-
+```
+make clean
+```
+- Exit the container with follow code
+```
+quit
+```
 ### Licenses
 
 The software content of this template repository licensed under the [MIT License](https://spdx.org/licenses/MIT.html). See the [license file](LICENSE.md) for more information.
