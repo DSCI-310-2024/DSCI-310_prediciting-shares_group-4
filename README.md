@@ -18,14 +18,9 @@ To finish up this project you will need to install:
 
 ### Dockerfile
 
-To use dockerfile, first download the release and extract it on your drive. Then using a CLI (Command line interface), set the release to be your current directory. Then use the follwing to run the dockerfile:
+To use dockerfile, first download the release and extract it on your drive. Then set your working directory to the project. Once done, input the following:
 
-`docker run --rm -it -v /$(pwd):/home/jovyan/project --entrypoint=bash hyud/dsci-310_predicting-shares_group-4:main`
-
-Once you are in the container, use the following to access the release within the container:
-
-`cd project`
-
+`docker-compose run analysis-env`
 
 ### Makefile
 
