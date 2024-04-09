@@ -1,6 +1,6 @@
 services:
   analysis-env:
-    image: hyud/dsci-310_predicting-shares_group-4:main
+    image: hyud/dsci-310_predicting-shares_group-4:DockerCompose
     stdin_open: true
     tty: true
     ports:
