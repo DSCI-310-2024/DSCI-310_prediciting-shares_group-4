@@ -22,7 +22,7 @@ RUN mamba install --yes \
     'r-repr=1.1.6' \
     'r-tidyverse=2.0.0' \
     'r-devtools=2.4.5' \
-    'r-caret=6.0_76' \
+    'r-caret=6.0_94' \
     'r-tidymodels=1.2.0' \
     'r-shiny=1.8.1.1' \
     'r-irkernel=1.3.2' \
