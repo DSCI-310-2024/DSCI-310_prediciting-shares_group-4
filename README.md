@@ -33,9 +33,22 @@ Renders the prediction report from the .qmd file into an HTML format and saves i
 
 Using the Makefile:
 
+- Clean first with below code
+```
+make clean
+```
 - Run the analysis: Running make all at the command line will run the analysis easily from top to bottom
+```
+make all
+```
 - Undo the analysis: Running make clean at the command line will undo the analysis and delete all generated data and files
-
+```
+make clean
+```
+- Exit the container with follow code
+```
+quit
+```
 ### Licenses
 
 The software content of this template repository licensed under the [MIT License](https://spdx.org/licenses/MIT.html). See the [license file](LICENSE.md) for more information.
