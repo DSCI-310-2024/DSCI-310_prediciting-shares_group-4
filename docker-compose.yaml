@@ -1,0 +1,12 @@
+services:
+  analysis-env:
+    image: hyud/dsci-310_predicting-shares_group-4:DockerCompose
+    stdin_open: true
+    tty: true
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/home/jovyan/project
+    working_dir: /home/jovyan/project
+    entrypoint: bash
+    platform: linux/amd64
