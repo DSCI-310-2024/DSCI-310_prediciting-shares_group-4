@@ -1,5 +1,5 @@
 # Use an official Jupyter image with R
-FROM jupyter/r-notebook:latest
+FROM quay.io/jupyter/r-notebook:2024-04-01
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -12,10 +12,19 @@ RUN sudo -S \
 
 # Install R packages
 RUN mamba install --yes \
+    'r-base=4.3.3' \
     'r-docopt=0.7.1' \
     'r-ggally=2.2.1' \
     'r-leaps=3.1' \
     'r-boot=1.3-30' \
     'r-pROC=1.18.5' \
-    'r-repr=1.1.6'
+    'r-repr=1.1.6' \
+    'r-tidyverse=2.0.0' \
+    'r-devtools=2.4.5' \
+    'r-caret=6.0_76' \
+    'r-tidymodels=1.2.0' \
+    'r-shiny=1.8.1.1' \
+    'r-irkernel=1.3.2'
+
+RUN Rscript -e 'devtools::install_github("DSCI-310-2024/dsci310_utils")'
 
