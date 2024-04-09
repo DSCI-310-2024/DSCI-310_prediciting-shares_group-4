@@ -11,7 +11,6 @@ RUN sudo -S \
     make \
     gdebi
 
-
 # Install R packages
 RUN mamba install --yes \
     'r-base=4.3.3' \

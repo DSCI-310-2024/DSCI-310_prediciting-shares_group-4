@@ -11,6 +11,7 @@ Options:
 # import libraries/packages
 suppressMessages(library(tidyverse))
 suppressWarnings(library(docopt))
+source("./R/unzip_URL.R")
 
 
 # parse/define command line arguments here
@@ -20,12 +21,8 @@ opt <- docopt(doc)
 main <- function(url, output){
     url1 <- toString(url)
     output1 <- toString(output)
-    dir.create(file.path(output1), showWarnings = FALSE)
-    temp_path <- paste(output1, 'data.zip', sep = "")
-    suppressMessages(download.file(url1, temp_path ,mode = 'wb'))
-    unzip(temp_path, exdir = output1)
+    unzip_URL(url1,output1)
     data <- suppressMessages(read_csv(paste(output1, 'OnlineNewsPopularity/OnlineNewsPopularity.csv', sep = "")))
-    unlink(temp_path)
     unlink(paste(output1, 'OnlineNewsPopularity', sep = ""), recursive = TRUE)
     write_csv(data, paste(output1, 'raw_Data.csv', sep = ''))
 }

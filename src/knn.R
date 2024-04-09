@@ -13,6 +13,7 @@ suppressMessages(library(tidyverse))
 suppressWarnings(library(docopt))
 suppressMessages(library(kknn))
 suppressMessages(library(tidymodels))
+source("./R/create_conf_mat_summary.R")
 
 # parse/define command line arguments here
 opt <- docopt(doc)
@@ -44,15 +45,7 @@ main <- function(output, workflow){
     FN <- confusion_matrix$table[1, 2]
     TN <- confusion_matrix$table[1, 1]  
 
-    knn_precision <- TP / (TP + FP)
-    knn_recall <- TP / (TP + FN)
-    knn_accuracy <- (TP + TN) / (TP + FP + FN + TN)
-
-    conf_mat_summary <- data.frame(
-      Precision = round(knn_precision,4),
-      Recall = round(knn_recall,4),
-      Accuracy = round(knn_accuracy,4))
-    write_csv(conf_mat_summary, paste('data/', 'conf_mat_summary.csv', sep = ''))
+    create_conf_mat_summary(TP,FP,FN,TN,'data/')
 
 }
 
