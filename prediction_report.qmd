@@ -1,5 +1,6 @@
 ---
 title: Exploratory Data Analysis
+author: Amar Gill, Anshnoor Kaur, Hanyu Dai, Yanxin Liang
 jupyter: ir
 format: 
     html:
