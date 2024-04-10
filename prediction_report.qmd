@@ -21,6 +21,9 @@ bibliography: references.bib
 # Title
 Predicting number of shares an article will get based on the number of links, images and videos in the article.
 
+# Research Question
+Can the number of images, links and videos in an article predict the number of shares on social media that the article will get?
+
 ## Introduction:
 
 Social media platforms, such as Twitter, have transformed the way in which information is disseminated and consumed on a global scale. These digital arenas enable a vast online community to quickly share and consume personal thoughts and professional insights, threaded through a variety of media forms. With over 500 million active users, Twitter has become particularly noteworthy for pinpointing the workings of information exchange and the features of content that make it most popular @Ignacio.
