@@ -58,7 +58,7 @@ main <- function(data, output){
         geom_line() +
         labs(x = "Number of neighbors", y = "Accuracy Estimate") +
         ggtitle("Accuracy Estimates vs. Number of Neighbors")
-    ggsave(filename = paste('figs/', 'best_k.png', sep = ''), best_k_plot)
+    ggsave(filename = paste('docs/figs/', 'best_k.png', sep = ''), best_k_plot, create.dir = TRUE)
 
     knn_spec <- nearest_neighbor(weight_func = "rectangular", neighbors = 50) |>
     set_engine("kknn") |>

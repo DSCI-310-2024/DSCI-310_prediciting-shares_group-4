@@ -11,7 +11,7 @@ Options:
 # import libraries/packages
 suppressMessages(library(tidyverse))
 suppressWarnings(library(docopt))
-source("./R/unzip_URL.R")
+suppressWarnings(library(dsci310utils))
 
 
 # parse/define command line arguments here

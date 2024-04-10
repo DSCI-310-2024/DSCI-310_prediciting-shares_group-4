@@ -1,7 +1,7 @@
 # Author: Amar Gill
 # date: 2024-03-07
 
-all: docs/prediction_report.qmd
+all: docs/prediction_report.html
 
 
 
@@ -21,9 +21,9 @@ data/clean_data.csv data/training_data.csv data/testing_data.csv	:	src/preproces
 
 
 # Runs the EDA.R script to create the figures (boxplot and histograms) and saves them in the figs folder
-figs/images.png figs/links.png figs/shares.png figs/videos.png data/num_obs_training.csv	:	src/EDA.R data/training_data.csv
+docs/figs/images.png docs/figs/links.png docs/figs/shares.png docs/figs/videos.png data/num_obs_training.csv	:	src/EDA.R data/training_data.csv
 	Rscript src/EDA.R --data=data/training_data.csv \
-		--output=figs/
+		--output=docs/figs/
 
 # Runs the workflow.R script to define the recipe, specification, perform cross-validation, choose best k value after
 # looking at the best k plot, re-defining the specification based on the best k value and fitting the training data.
@@ -36,16 +36,20 @@ src/objects/conf_mat.rds data/model_accuracy.csv	:	src/knn.R src/objects/knn_fit
 
 # Saves the prediction report to the docs folder after rendering it from the prediction_report.qmd file
 # generated from its dependencies
-docs/prediction_report.qmd	: data/training_data.csv data/testing_data.csv \
-figs/images.png figs/links.png figs/shares.png data/num_obs_training.csv \
-figs/videos.png src/objects/conf_mat.rds data/model_accuracy.csv data/share_summary.csv data/conf_mat_summary.csv
-	quarto render prediction_report.qmd --to html
+docs/prediction_report.html : data/training_data.csv data/testing_data.csv \
+docs/figs/images.png docs/figs/links.png docs/figs/shares.png data/num_obs_training.csv \
+docs/figs/videos.png src/objects/conf_mat.rds data/model_accuracy.csv data/share_summary.csv data/conf_mat_summary.csv
+	mv docs/prediction_report.qmd ./
+	quarto render prediction_report.qmd --to html;
+	mv prediction_report.qmd docs/
 
 
 
 # clean
 clean:
-	rm -rf figs
-	rm -rf data
-	rm -rf src/objects
+	rm -rf data;
+	rm -rf src/objects;
+	ln docs/prediction_report.qmd ./
 	rm -rf docs
+	mkdir -p docs
+	mv prediction_report.qmd docs/

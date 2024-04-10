@@ -13,7 +13,7 @@ suppressMessages(library(tidyverse))
 suppressWarnings(library(docopt))
 suppressMessages(library(kknn))
 suppressMessages(library(tidymodels))
-source("./R/create_conf_mat_summary.R")
+suppressWarnings(library(dsci310utils))
 
 # parse/define command line arguments here
 opt <- docopt(doc)
