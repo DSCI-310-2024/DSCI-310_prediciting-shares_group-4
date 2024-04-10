@@ -29,7 +29,7 @@ RUN mamba install --yes \
     'r-kknn=1.3.1' \
     'r-testthat=3.2.1'
 
-RUN Rscript -e 'devtools::install_github("DSCI-310-2024/dsci310_utils")'
+RUN Rscript -e 'devtools::install_github("DSCI-310-2024/dsci310_utils", upgrade = FALSE)'
 
 ARG QUARTO_VERSION="1.4.537"
 RUN curl -o quarto-linux-amd64.deb -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb
