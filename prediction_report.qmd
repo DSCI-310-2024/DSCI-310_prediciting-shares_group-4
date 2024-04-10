@@ -81,11 +81,10 @@ According to @tbl-num_obs, We can see that our data is balanced and since we hav
 Next, we visualize the distributions of our predictor variables: num_hrefs, num_imgs, and num_videos. We use is_popular as the fill argument.
 
 
-::: {layout-ncol=3}
+::: {layout-ncol=2}
 ![Histogram of number of links in popular and non-Popular articles](figs/links.png){#fig-num_links}
 
 ![Histogram of number of images in popular and non-Popular articles](figs/images.png){#fig-num_images}
-
 
 ![Histogram of number of videos in popular and non-Popular articles](figs/videos.png){#fig-num_videos}
 

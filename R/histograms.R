@@ -51,7 +51,8 @@ make_histogram <- function(data_frame, xvar, yvar, hist_title, xlabel) {
     geom_histogram(color = "black", bins = 30) +
     labs(title = hist_title, 
         x = xlabel,
-        fill = "Popular")
+        fill = "Popular") +
+        theme(text = element_text(size=20)) 
 
   return(histogram)
 }
