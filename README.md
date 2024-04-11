@@ -104,7 +104,7 @@ make clean
 ```
 - Exit the container with follow code
 ```
-quit
+exit
 ```
 
 ### Licenses
