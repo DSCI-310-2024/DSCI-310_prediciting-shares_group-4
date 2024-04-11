@@ -12,6 +12,7 @@ Options:
 suppressMessages(library(tidyverse))
 suppressWarnings(library(docopt))
 suppressMessages(suppressWarnings(library(tidymodels)))
+suppressWarnings(library(dsci310utils))
 
 # parse/define command line arguments here
 opt <- docopt(doc)
@@ -23,8 +24,8 @@ main <- function(data, output){
     output1 <- toString(output)
     fullData <- suppressMessages(read_csv(data1))
     required_columns <- c("shares", "num_hrefs", "num_imgs", "num_videos")
-    clean_Data <- fullData |>
-      dplyr::select(all_of(required_columns)) |>
+    clean_Data <- clean_data(fullData,required_columns)
+    clean_Data <- clean_Data |>
       dplyr::mutate(is_popular = ifelse(shares < 1400, 0, 1),
                     is_popular = as.factor(is_popular))
     write_csv(clean_Data, paste(output1, 'clean_Data.csv', sep = ''))
