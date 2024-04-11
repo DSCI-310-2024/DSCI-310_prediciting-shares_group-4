@@ -71,8 +71,10 @@ Running the below code in your terminal/ command prompt should give you informat
 docker info
 ```
 
-4. Use docker-compose to build the containerized environment and run the analysis
-
+4. Pull docker image and use docker-compose to build the containerized environment and run the analysis
+```
+docker pull hyud/dsci-310_predicting-shares_group-4:main
+```
 ```
 docker-compose run analysis-env
 ```
