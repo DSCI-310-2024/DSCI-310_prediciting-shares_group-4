@@ -12,4 +12,3 @@ services:
       - .:/home/jovyan/project
     working_dir: /home/jovyan/project
     entrypoint: bash
-    platform: linux/amd64
