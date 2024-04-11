@@ -76,10 +76,11 @@ docker info
 ```
 docker-compose run analysis-env
 ```
+This can take a few minutes to run.
 
 5. Use ```make clean``` to clean up results from any previous runs of the analysis. Then finally use ```make all``` to run the analysis.
 
-6. The analysis can take a few minutes to run. The results can be viewed by typing ```open docs/prediction_report.html```
+6. The analysis can take a few minutes to run. The final report is available here and can be opened in a suitable web browser: docs/prediction_report.html
 
 ### Makefile
 
