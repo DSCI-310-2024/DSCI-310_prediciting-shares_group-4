@@ -77,7 +77,7 @@ docker info
 docker-compose run analysis-env
 ```
 
-5. The ``` make all ``` command can then be used to run the analysis. Note that it is recommended to run ``` make clean``` to clean up results from any previous runs of the analysis.
+5. Use ``` make clean``` to clean up results from any previous runs of the analysis. Then finally use ``` make all ``` to run the analysis.
 
 6. The analysis can take a few minutes to run. The results can be viewed by typing ``` open docs/prediction_report.html ```
 
