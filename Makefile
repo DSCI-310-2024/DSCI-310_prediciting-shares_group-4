@@ -1,7 +1,20 @@
 # Author: Amar Gill
 # date: 2024-03-07
 
-all: docs/prediction_report.html
+all: data/raw_data.csv \
+data/share_summary.csv \
+data/clean_data.csv \
+data/training_data.csv \
+data/testing_data.csv \
+docs/figs/images.png \
+docs/figs/links.png \
+docs/figs/shares.png \
+docs/figs/videos.png \
+data/num_obs_training.csv \
+src/objects/knn_fit.rds \
+src/objects/conf_mat.rds \
+data/model_accuracy.csv \
+docs/prediction_report.html
 
 
 
