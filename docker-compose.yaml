@@ -1,6 +1,9 @@
 services:
   analysis-env:
     image: hyud/dsci-310_predicting-shares_group-4
+    user: root
+    environment:
+      GRANT_SUDO: "yes"
     build: 
       tags:
         - "main"
