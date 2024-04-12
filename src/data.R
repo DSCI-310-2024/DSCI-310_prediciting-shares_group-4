@@ -37,7 +37,6 @@ main <- function(url, output){
     write_csv(data, paste(output1, 'raw_Data.csv', sep = ''))
 }
 
-# code for other functions & tests goes here
 
 # call main function
 main(opt$url, opt$output) # pass any command line args to main here
