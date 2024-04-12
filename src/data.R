@@ -19,11 +19,21 @@ opt <- docopt(doc)
 
 # define main function
 main <- function(url, output){
+    
+    # Set the inputs to be strings
     url1 <- toString(url)
     output1 <- toString(output)
+
+    # Download the zip file and extract it to the given output
     unzip_URL(url1,output1)
+
+    # Read the .csv into a data frame
     data <- suppressMessages(read_csv(paste(output1, 'OnlineNewsPopularity/OnlineNewsPopularity.csv', sep = "")))
+    
+    # Delete the unneeded extracted files
     unlink(paste(output1, 'OnlineNewsPopularity', sep = ""), recursive = TRUE)
+
+    # Save the data frame as raw Data
     write_csv(data, paste(output1, 'raw_Data.csv', sep = ''))
 }
 
